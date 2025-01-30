@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+</head>
+<body>
+    <h1>Send Notifications</h1>
+    <form id="notificationForm">
+        <div>
+            <label>Select Users:</label><br>
+            <select multiple id="users" name="user_ids[]" required>
+                <?php
+                require 'db.php';
+                $stmt = $pdo->query("SELECT id, mobile FROM users");
+                while ($row = $stmt->fetch()) {
+                    echo "<option value='{$row['id']}'>{$row['mobile']}</option>";
+                }
+                ?>
+            </select>
+        </div>
+        <div>
+            <label>Message:</label><br>
+            <textarea name="message" required></textarea>
+        </div>
+        <button type="submit">Send Notification</button>
+    </form>
+
+    <script>
+        document.getElementById('notificationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const response = await fetch('send-notification.php', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            alert(result.status === 'success' ? 'Notification sent!' : 'Error sending notification');
+        });
+    </script>
+</body>
+</html>

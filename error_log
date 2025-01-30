@@ -1,0 +1,84 @@
+[29-Jan-2025 21:06:13 UTC] Array
+(
+    [id] => 1
+    [0] => 1
+    [username] => admin
+    [1] => admin
+    [password] => $2y$10$t8VQ5pJ.EZdJYzMj5qkO.e5u7Hd3jig4l3W1jD6k0wZG9u4Lzq1mG
+    [2] => $2y$10$t8VQ5pJ.EZdJYzMj5qkO.e5u7Hd3jig4l3W1jD6k0wZG9u4Lzq1mG
+)
+
+[29-Jan-2025 21:06:13 UTC] Input password: admin123
+[29-Jan-2025 21:06:13 UTC] Stored hash: $2y$10$t8VQ5pJ.EZdJYzMj5qkO.e5u7Hd3jig4l3W1jD6k0wZG9u4Lzq1mG
+[29-Jan-2025 21:06:14 UTC] Verification: false
+[29-Jan-2025 21:07:23 UTC] Array
+(
+    [id] => 1
+    [0] => 1
+    [username] => admin
+    [1] => admin
+    [password] => $2y$10$t8VQ5pJ.EZdJYzMj5qkO.e5u7Hd3jig4l3W1jD6k0wZG9u4Lzq1mG
+    [2] => $2y$10$t8VQ5pJ.EZdJYzMj5qkO.e5u7Hd3jig4l3W1jD6k0wZG9u4Lzq1mG
+)
+
+[29-Jan-2025 21:07:23 UTC] Input password: admin123
+[29-Jan-2025 21:07:23 UTC] Stored hash: $2y$10$t8VQ5pJ.EZdJYzMj5qkO.e5u7Hd3jig4l3W1jD6k0wZG9u4Lzq1mG
+[29-Jan-2025 21:07:24 UTC] Verification: false
+[29-Jan-2025 21:07:43 UTC] Array
+(
+    [id] => 1
+    [0] => 1
+    [username] => admin
+    [1] => admin
+    [password] => $2y$10$t8VQ5pJ.EZdJYzMj5qkO.e5u7Hd3jig4l3W1jD6k0wZG9u4Lzq1mG
+    [2] => $2y$10$t8VQ5pJ.EZdJYzMj5qkO.e5u7Hd3jig4l3W1jD6k0wZG9u4Lzq1mG
+)
+
+[29-Jan-2025 21:07:43 UTC] Input password: admin123
+[29-Jan-2025 21:07:43 UTC] Stored hash: $2y$10$t8VQ5pJ.EZdJYzMj5qkO.e5u7Hd3jig4l3W1jD6k0wZG9u4Lzq1mG
+[29-Jan-2025 21:07:43 UTC] Verification: false
+[29-Jan-2025 21:08:37 UTC] Array
+(
+    [id] => 2
+    [0] => 2
+    [username] => admin
+    [1] => admin
+    [password] => $2y$10$t8VQ5pJ.EZdJYzMj5qkO.e5u7Hd3jig4l3W1jD6k0wZG9u4Lzq1mG
+    [2] => $2y$10$t8VQ5pJ.EZdJYzMj5qkO.e5u7Hd3jig4l3W1jD6k0wZG9u4Lzq1mG
+)
+
+[29-Jan-2025 21:08:37 UTC] Input password: admin123
+[29-Jan-2025 21:08:37 UTC] Stored hash: $2y$10$t8VQ5pJ.EZdJYzMj5qkO.e5u7Hd3jig4l3W1jD6k0wZG9u4Lzq1mG
+[29-Jan-2025 21:08:37 UTC] Verification: false
+[29-Jan-2025 21:23:34 UTC] PHP Warning:  openssl_sign(): Supplied key param cannot be coerced into a private key in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 30
+[29-Jan-2025 21:23:35 UTC] PHP Warning:  file_get_contents(https://oauth2.googleapis.com/token): Failed to open stream: HTTP request failed! HTTP/1.1 400 Bad Request
+ in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 49
+[29-Jan-2025 21:23:35 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 50
+[29-Jan-2025 21:23:35 UTC] PHP Warning:  Undefined variable $serviceAccount in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 55
+[29-Jan-2025 21:23:35 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 55
+[29-Jan-2025 21:23:35 UTC] PHP Warning:  file_get_contents(https://fcm.googleapis.com/v1/projects//messages:send): Failed to open stream: HTTP request failed! HTTP/1.1 401 Unauthorized
+ in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 72
+[29-Jan-2025 21:41:23 UTC] PHP Warning:  file_get_contents(https://oauth2.googleapis.com/token): Failed to open stream: HTTP request failed! HTTP/1.1 400 Bad Request
+ in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 30
+[29-Jan-2025 21:41:23 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 37
+[29-Jan-2025 21:41:23 UTC] PHP Warning:  file_get_contents(https://fcm.googleapis.com/v1/projects/doyalty-fcm/messages:send): Failed to open stream: HTTP request failed! HTTP/1.1 401 Unauthorized
+ in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 64
+[29-Jan-2025 21:49:03 UTC] PHP Warning:  file_get_contents(https://oauth2.googleapis.com/token): Failed to open stream: HTTP request failed! HTTP/1.1 400 Bad Request
+ in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 30
+[29-Jan-2025 21:49:03 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 37
+[29-Jan-2025 21:49:03 UTC] PHP Warning:  file_get_contents(https://fcm.googleapis.com/v1/projects/doyalty-fcm/messages:send): Failed to open stream: HTTP request failed! HTTP/1.1 401 Unauthorized
+ in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 64
+[29-Jan-2025 22:09:11 UTC] PHP Warning:  file_get_contents(https://oauth2.googleapis.com/token): Failed to open stream: HTTP request failed! HTTP/1.1 400 Bad Request
+ in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 30
+[29-Jan-2025 22:09:11 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 37
+[29-Jan-2025 22:09:11 UTC] PHP Warning:  file_get_contents(https://fcm.googleapis.com/v1/projects/doyalty-fcm/messages:send): Failed to open stream: HTTP request failed! HTTP/1.1 401 Unauthorized
+ in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 64
+[29-Jan-2025 23:09:22 UTC] PHP Warning:  Undefined variable $unread_count in /home/f5digit2/public_html/doyalty.com/gptwebpush/navbar.php on line 7
+[30-Jan-2025 10:21:59 UTC] PHP Warning:  Undefined variable $unread_count in /home/f5digit2/public_html/doyalty.com/gptwebpush/navbar.php on line 7
+[30-Jan-2025 11:00:16 UTC] PHP Warning:  file_get_contents(https://oauth2.googleapis.com/token): Failed to open stream: HTTP request failed! HTTP/1.1 400 Bad Request
+ in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 30
+[30-Jan-2025 11:00:16 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 37
+[30-Jan-2025 11:00:16 UTC] PHP Warning:  file_get_contents(https://fcm.googleapis.com/v1/projects/doyalty-fcm/messages:send): Failed to open stream: HTTP request failed! HTTP/1.1 401 Unauthorized
+ in /home/f5digit2/public_html/doyalty.com/gptwebpush/send-notification.php on line 64
+[30-Jan-2025 11:00:17 UTC] PHP Warning:  Undefined variable $unread_count in /home/f5digit2/public_html/doyalty.com/gptwebpush/navbar.php on line 7
+[30-Jan-2025 11:00:25 UTC] PHP Warning:  Undefined variable $unread_count in /home/f5digit2/public_html/doyalty.com/gptwebpush/navbar.php on line 7
