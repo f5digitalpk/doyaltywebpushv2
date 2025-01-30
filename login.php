@@ -1,6 +1,6 @@
 <?php
-require 'db.php';
 session_start();
+require 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $mobile = preg_replace('/[^0-9+]/', '', $_POST['mobile']);
@@ -12,19 +12,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $stmt->fetch();
 
         if (!$user) {
-            // Insert new user without password
-            $stmt = $pdo->prepare("INSERT INTO users (mobile) VALUES (?)");
+            // Insert new user with NULL fcm_token
+            $stmt = $pdo->prepare("INSERT INTO users (mobile, fcm_token) VALUES (?, NULL)");
             $stmt->execute([$mobile]);
             $userId = $pdo->lastInsertId();
         } else {
             $userId = $user['id'];
         }
 
-        // Set session
         $_SESSION['user_id'] = $userId;
         $_SESSION['mobile'] = $mobile;
         
-        // Redirect to notifications
         header("Location: notifications.php");
         exit;
 

@@ -1,27 +1,31 @@
 <?php
-require 'db.php';
 session_start();
+require 'db.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
 
-// Mark notifications as read
-$pdo->beginTransaction();
-try {
-    $pdo->prepare("UPDATE notifications SET is_read = 1 WHERE user_id = ?")
-        ->execute([$_SESSION['user_id']]);
-    $pdo->commit();
-} catch(Exception $e) {
-    $pdo->rollBack();
-}
+// Pagination
+$perPage = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $perPage;
 
-// Get notifications
+// Get total notifications
+$totalStmt = $pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ?");
+$totalStmt->execute([$_SESSION['user_id']]);
+$totalNotifications = $totalStmt->fetchColumn();
+
+// Get paginated notifications
 $stmt = $pdo->prepare("SELECT * FROM notifications 
-                      WHERE user_id = ? 
-                      ORDER BY created_at DESC");
-$stmt->execute([$_SESSION['user_id']]);
+                      WHERE user_id = :user_id 
+                      ORDER BY created_at DESC 
+                      LIMIT :limit OFFSET :offset");
+$stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
+$stmt->execute();
 $notifications = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
@@ -31,165 +35,110 @@ $notifications = $stmt->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notifications</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .notification-list {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 15px;
-        }
         .notification-card {
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-            position: relative;
-            overflow: hidden;
-        }
-        .notification-card:hover {
-            transform: translateX(10px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #0d6efd;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease-in-out;
         }
         .notification-card.unread {
-            border-left-color: #0d6efd;
-            background-color: #f8f9fa;
+            border-left-color: #dc3545;
         }
-        .notification-time {
-            font-size: 0.85rem;
-            color: #6c757d;
+        .notification-card:hover {
+            transform: scale(1.05);
         }
-        .notification-actions {
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        .pagination {
+            margin-top: 2rem;
         }
-        .notification-card:hover .notification-actions {
-            opacity: 1;
+        .notification-card p {
+            max-height: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .empty-state {
-            text-align: center;
-            padding: 4rem;
-            color: #6c757d;
-        }
-        .empty-state i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            color: #dee2e6;
-        }
-        .badge-circle {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
+        .modal-content {
+            border-radius: 20px;
         }
     </style>
 </head>
 <body>
-    <?php include 'navbar.php'; // Include navigation bar ?>
-    
-    <div class="notification-list">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Notifications</h2>
-            <button class="btn btn-outline-secondary" onclick="refreshNotifications()">
-                <i class="fas fa-sync"></i> Refresh
-            </button>
-        </div>
+    <div class="container py-4">
+        <h1>Your Notifications</h1>
 
-        <?php if(count($notifications) > 0): ?>
-            <div class="list-group">
+        <!-- Notification Cards -->
+        <div class="row">
+            <?php if (count($notifications) > 0): ?>
                 <?php foreach ($notifications as $notification): ?>
-                    <div class="list-group-item notification-card <?= $notification['is_read'] ? '' : 'unread' ?>"
-                        data-id="<?= $notification['id'] ?>">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="me-3">
-                                <?php if(!$notification['is_read']): ?>
-                                    <span class="badge bg-primary badge-circle"></span>
-                                <?php endif; ?>
-                                <div class="mb-1"><?= htmlspecialchars($notification['message']) ?></div>
-                                <small class="notification-time">
-                                    <i class="fas fa-clock"></i>
-                                    <?= date('M j, Y \a\t g:i A', strtotime($notification['created_at'])) ?>
-                                </small>
-                            </div>
-                            <div class="notification-actions">
-                                <button class="btn btn-sm btn-outline-danger" 
-                                        onclick="deleteNotification(<?= $notification['id'] ?>)">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                        <div class="notification-card <?= $notification['is_read'] ? '' : 'unread' ?>" 
+                             data-bs-toggle="modal" 
+                             data-bs-target="#notificationModal" 
+                             data-bs-message="<?= htmlspecialchars($notification['message']) ?>"
+                             data-bs-created="<?= date('M j, Y g:i a', strtotime($notification['created_at'])) ?>"
+                             data-bs-details="<?= isset($notification['details']) ? htmlspecialchars($notification['details']) : 'No details available' ?>">
+                            <p><?= htmlspecialchars($notification['message']) ?></p>
+                            <small class="text-muted">
+                                <?= date('M j, Y g:i a', strtotime($notification['created_at'])) ?>
+                            </small>
                         </div>
                     </div>
                 <?php endforeach; ?>
+            <?php else: ?>
+                <div class="alert alert-info">No notifications found.</div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Pagination -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <?php for ($i = 1; $i <= ceil($totalNotifications / $perPage); $i++): ?>
+                    <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                        <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                    </li>
+                <?php endfor; ?>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Modal for Notification Details -->
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel">Notification Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h5 id="notificationMessage"></h5>
+                    <p><strong>Details:</strong> <span id="notificationDetails"></span></p>
+                    <p><strong>Created on:</strong> <span id="notificationCreated"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
-        <?php else: ?>
-            <div class="empty-state">
-                <i class="fas fa-bell-slash"></i>
-                <h4>No notifications yet</h4>
-                <p class="text-muted">We'll notify you when there's something new.</p>
-            </div>
-        <?php endif; ?>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Real-time updates
-        const eventSource = new EventSource('notification-stream.php');
-        
-        eventSource.onmessage = function(e) {
-            const notification = JSON.parse(e.data);
-            const list = document.querySelector('.list-group');
-            
-            if(list) {
-                const newNotification = createNotificationElement(notification);
-                list.prepend(newNotification);
-            }
-        };
+        var notificationModal = document.getElementById('notificationModal');
+        notificationModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget; // Button that triggered the modal
+            var message = button.getAttribute('data-bs-message');
+            var created = button.getAttribute('data-bs-created');
+            var details = button.getAttribute('data-bs-details');
 
-        function createNotificationElement(notification) {
-            const element = document.createElement('div');
-            element.className = `list-group-item notification-card ${notification.is_read ? '' : 'unread'}`;
-            element.innerHTML = `
-                <div class="d-flex justify-content-between align-items-start">
-                    <div class="me-3">
-                        ${!notification.is_read ? '<span class="badge bg-primary badge-circle"></span>' : ''}
-                        <div class="mb-1">${notification.message}</div>
-                        <small class="notification-time">
-                            <i class="fas fa-clock"></i>
-                            ${new Date(notification.created_at).toLocaleString()}
-                        </small>
-                    </div>
-                    <div class="notification-actions">
-                        <button class="btn btn-sm btn-outline-danger" 
-                                onclick="deleteNotification(${notification.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-            return element;
-        }
+            var modalMessage = notificationModal.querySelector('#notificationMessage');
+            var modalDetails = notificationModal.querySelector('#notificationDetails');
+            var modalCreated = notificationModal.querySelector('#notificationCreated');
 
-        async function deleteNotification(id) {
-            if(confirm('Are you sure you want to delete this notification?')) {
-                try {
-                    const response = await fetch(`delete-notification.php?id=${id}`, {
-                        method: 'DELETE'
-                    });
-                    
-                    if(response.ok) {
-                        document.querySelector(`[data-id="${id}"]`).remove();
-                    }
-                } catch(error) {
-                    console.error('Error deleting notification:', error);
-                }
-            }
-        }
-
-        function refreshNotifications() {
-            window.location.reload();
-        }
+            modalMessage.textContent = message;
+            modalDetails.textContent = details; // This will display 'No details available' if no details exist
+            modalCreated.textContent = "Created on: " + created;
+        });
     </script>
 </body>
 </html>
